@@ -3,12 +3,13 @@ import random
 import pandas as pd
 
 from pandas.core.frame import DataFrame
-from sklearn.preprocessing import OneHotEncoder, scale
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler
 
 
 def read_dataset():
-    df = pd.read_csv('drug_consumption.csv')    # read from file
-    df = df.drop(labels=['id'], axis=1)         # drop id column
+    df = pd.read_csv('drug_consumption.csv')        # read from file
+    df = df[df.semeron == 'CL0']                    # drop 'Semeron' users
+    df = df.drop(labels=['id', 'semeron'], axis=1)  # drop id, semeron columns
     return df
 
 
@@ -109,6 +110,13 @@ def map_to_actual_values(df):
 
 
 def prepare_for_classification(df):
+    cols = df.columns                           # get original column names
+    df = df.apply(LabelEncoder().fit_transform)  # label encode
+    vals = df.values
+    vals = MinMaxScaler().fit_transform(vals)   # minmax scale
+    df = DataFrame(vals)
+    df = df.apply(round, args=(2,))             # round
+    df.columns = cols                           # reassign column names
     return df
 
 
@@ -231,8 +239,6 @@ def prepare_for_association(df):
                              'mushrooms_True',
                              'nicotine_False',
                              'nicotine_True',
-                             'semeron_False',
-                             'semeron_True',
                              'vsa_False',
                              'vsa_True']
     df = df[reorder_feature_names]
