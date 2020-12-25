@@ -53,7 +53,7 @@ def main():
               'kNN11', 'DTC', 'NN', 'MLP', 'SVM', 'RFC']
     scores = [nbc_score, knn3_score, knn5_score, knn11_score,
               dtc_score, cnn_score, mlp_score, svm_score, rfc_score]
-    scores = map(lambda x: round(x*100, 1), scores)
+    scores = list(map(lambda x: round(x*100, 1), scores))
     times = [nbc_time, knn3_time, knn5_time, knn11_time,
              dtc_time, cnn_time, mlp_time, svm_time, rfc_time]
 
@@ -67,7 +67,6 @@ def main():
     plt.close()
 
     plot_space = max(times) - min(times)
-    plt.ylim([min(times) - plot_space, max(times) + plot_space])
     plt.bar(labels, times)
     plt.xlabel('Classifier')
     plt.ylabel('Time (s)')

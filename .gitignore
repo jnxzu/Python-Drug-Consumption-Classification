@@ -2,5 +2,7 @@ readable.csv
 association.csv
 classification.csv
 interesting_rules.csv
+classifier_accuracy.png
+classifier_timing.png
 projekt2.pdf
 __pycache__
