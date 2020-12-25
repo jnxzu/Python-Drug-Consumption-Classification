@@ -248,18 +248,3 @@ def prepare_for_association(df):
     new_df = new_df[reorder_feature_names]
 
     return new_df
-
-
-def main():
-    # pd.options.display.max_columns = df.shape[1]
-    original_df = read_dataset()
-    readable_df = map_to_actual_values(original_df)
-    readable_df.to_csv('readable.csv')
-    assoc_df = prepare_for_association(original_df)
-    assoc_df.to_csv('association.csv')
-    class_df = prepare_for_classification(original_df)
-    class_df.to_csv('classification.csv')
-
-
-if __name__ == "__main__":
-    main()
