@@ -49,7 +49,7 @@ def main():
     rfc_score, rfc_time = classification.random_forest_classification(
         train_in, test_in, train_out, test_out)
 
-    labels = ['Naive Bayes', 'kNN3', 'kNN5',
+    labels = ['NB', 'kNN3', 'kNN5',
               'kNN11', 'DTC', 'NN', 'MLP', 'SVM', 'RFC']
     scores = [nbc_score, knn3_score, knn5_score, knn11_score,
               dtc_score, cnn_score, mlp_score, svm_score, rfc_score]
@@ -60,6 +60,8 @@ def main():
     plot_space = max(scores) - min(scores)
     plt.ylim([min(scores) - plot_space, max(scores) + plot_space])
     plt.bar(labels, scores)
+    for i, v in enumerate(scores):
+        plt.text(i - .3, v + 3, str(v))
     plt.xlabel('Classifier')
     plt.ylabel('% Accuracy')
     plt.title('Classifier Accuracy Comparison - Drug Consumption')
