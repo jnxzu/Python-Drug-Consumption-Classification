@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler
 
 def read_dataset():
     df = pd.read_csv('drug_consumption.csv')        # read from file
-    df = df[df.semeron == 'CL0']                    # drop 'Semeron' users
+    df = df[df.semeron == 'CL0']                    # drop 'Semeron' admitters
     df = df.drop(labels=['id', 'semeron'], axis=1)  # drop id, semeron columns
     return df
 
@@ -110,40 +110,44 @@ def map_to_actual_values(df):
 
 
 def prepare_for_classification(df):
-    cols = df.columns                           # get original column names
-    df = df.apply(LabelEncoder().fit_transform)  # label encode
-    vals = df.values
-    vals = MinMaxScaler().fit_transform(vals)   # minmax scale
-    df = DataFrame(vals)
-    df = df.apply(round, args=(2,))             # round
-    df.columns = cols                           # reassign column names
-    return df
+    new_df = df.copy()
+    # get original column names
+    cols = new_df.columns
+    new_df = new_df.apply(LabelEncoder().fit_transform)     # label encode
+    vals = new_df.values
+    vals = MinMaxScaler().fit_transform(vals)               # minmax scale
+    new_df = DataFrame(vals)
+    new_df = new_df.apply(round, args=(2,))                 # round
+    # reassign column names
+    new_df.columns = cols
+    return new_df
 
 
 def prepare_for_association(df):
+    new_df = df.copy()
     # map numerical values to one of three classes
     twelve_scale_bins = [0, 4.5, 9.5, 13]
     ten_scale_bins = [-1, 3.5, 7.5, 11]
     names = ['low', 'medium', 'high']
-    df['neuroticism'] = pd.cut(
-        df['neuroticism'], twelve_scale_bins, labels=names)
-    df['extraversion'] = pd.cut(
-        df['extraversion'], twelve_scale_bins, labels=names)
-    df['openness_to_experience'] = pd.cut(
-        df['openness_to_experience'], twelve_scale_bins, labels=names)
-    df['agreeableness'] = pd.cut(
-        df['agreeableness'], twelve_scale_bins, labels=names)
-    df['conscientiousness'] = pd.cut(
-        df['conscientiousness'], twelve_scale_bins, labels=names)
-    df['impulsiveness'] = pd.cut(
-        df['impulsiveness'], ten_scale_bins, labels=names)
-    df['sensation_seeking'] = pd.cut(
-        df['sensation_seeking'], ten_scale_bins, labels=names)
+    new_df['neuroticism'] = pd.cut(
+        new_df['neuroticism'], twelve_scale_bins, labels=names)
+    new_df['extraversion'] = pd.cut(
+        new_df['extraversion'], twelve_scale_bins, labels=names)
+    new_df['openness_to_experience'] = pd.cut(
+        new_df['openness_to_experience'], twelve_scale_bins, labels=names)
+    new_df['agreeableness'] = pd.cut(
+        new_df['agreeableness'], twelve_scale_bins, labels=names)
+    new_df['conscientiousness'] = pd.cut(
+        new_df['conscientiousness'], twelve_scale_bins, labels=names)
+    new_df['impulsiveness'] = pd.cut(
+        new_df['impulsiveness'], ten_scale_bins, labels=names)
+    new_df['sensation_seeking'] = pd.cut(
+        new_df['sensation_seeking'], ten_scale_bins, labels=names)
 
     # one hot encode the dataset
     ohenc = OneHotEncoder(sparse=False)
-    original_columns = df.columns
-    df = DataFrame(ohenc.fit_transform(df))
+    original_columns = new_df.columns
+    new_df = DataFrame(ohenc.fit_transform(new_df))
     feature_names = ohenc.get_feature_names()
     new_feature_names = []
 
@@ -155,7 +159,7 @@ def prepare_for_association(df):
             f'x{idx}', original_columns[idx]))
 
     # assign column names and reorder them
-    df.columns = new_feature_names
+    new_df.columns = new_feature_names
     reorder_feature_names = ['age_18-24',
                              'age_25-34',
                              'age_35-44',
@@ -241,18 +245,19 @@ def prepare_for_association(df):
                              'nicotine_True',
                              'vsa_False',
                              'vsa_True']
-    df = df[reorder_feature_names]
+    new_df = new_df[reorder_feature_names]
 
-    return df
+    return new_df
 
 
 def main():
-    df = read_dataset()
-    df = map_to_actual_values(df)
-    df.to_csv('readable.csv')
-    assoc_df = prepare_for_association(df)
+    # pd.options.display.max_columns = df.shape[1]
+    original_df = read_dataset()
+    readable_df = map_to_actual_values(original_df)
+    readable_df.to_csv('readable.csv')
+    assoc_df = prepare_for_association(original_df)
     assoc_df.to_csv('association.csv')
-    class_df = prepare_for_classification(df)
+    class_df = prepare_for_classification(original_df)
     class_df.to_csv('classification.csv')
 
 
