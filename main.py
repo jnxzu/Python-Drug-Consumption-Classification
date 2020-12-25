@@ -2,6 +2,9 @@ import classification
 import association
 import preprocessing
 import os
+
+import matplotlib.pyplot as plt
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
@@ -45,6 +48,32 @@ def main():
 
     rfc_score, rfc_time = classification.random_forest_classification(
         train_in, test_in, train_out, test_out)
+
+    labels = ['Naive Bayes', 'kNN3', 'kNN5',
+              'kNN11', 'DTC', 'NN', 'MLP', 'SVM', 'RFC']
+    scores = [nbc_score, knn3_score, knn5_score, knn11_score,
+              dtc_score, cnn_score, mlp_score, svm_score, rfc_score]
+    scores = map(lambda x: round(x*100, 1), scores)
+    times = [nbc_time, knn3_time, knn5_time, knn11_time,
+             dtc_time, cnn_time, mlp_time, svm_time, rfc_time]
+
+    plot_space = max(scores) - min(scores)
+    plt.ylim([min(scores) - plot_space, max(scores) + plot_space])
+    plt.bar(labels, scores)
+    plt.xlabel('Classifier')
+    plt.ylabel('% Accuracy')
+    plt.title('Classifier Accuracy Comparison - Drug Consumption')
+    plt.savefig('classifier_accuracy.png')
+    plt.close()
+
+    plot_space = max(times) - min(times)
+    plt.ylim([min(times) - plot_space, max(times) + plot_space])
+    plt.bar(labels, times)
+    plt.xlabel('Classifier')
+    plt.ylabel('Time (s)')
+    plt.title('Classifier Time Comparison - Drug Consumption')
+    plt.savefig('classifier_timing.png')
+    plt.close()
 
 
 if __name__ == "__main__":
