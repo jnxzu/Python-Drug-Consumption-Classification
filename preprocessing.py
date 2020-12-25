@@ -3,6 +3,7 @@ import random
 import pandas as pd
 
 from pandas.core.frame import DataFrame
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler
 
 
@@ -120,7 +121,16 @@ def prepare_for_classification(df):
     new_df = new_df.apply(round, args=(2,))                 # round
     # reassign column names
     new_df.columns = cols
-    return new_df
+
+    new_df.to_csv('classification.csv')
+
+    inputs = new_df.iloc[:, :12].values
+    classes = new_df.iloc[:, 12:].values
+
+    (train_inputs, test_inputs, train_classes, test_classes) = train_test_split(
+        inputs, classes, train_size=0.7)
+
+    return train_inputs, test_inputs, train_classes, test_classes
 
 
 def prepare_for_association(df):
@@ -246,5 +256,7 @@ def prepare_for_association(df):
                              'vsa_False',
                              'vsa_True']
     new_df = new_df[reorder_feature_names]
+
+    new_df.to_csv('association.csv')
 
     return new_df
