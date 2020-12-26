@@ -12,7 +12,16 @@ def find_association_rules(df):
 def get_interesting_rules(rules):
 
     # keep only interesting rules
-    def filter_antecedents(antes):
+    def only_substance_antecedents(antes):
+        substance_use_flag = False
+        for a in antes:
+            if 'False' in a:
+                return False
+            if 'True' in a:
+                substance_use_flag = True
+        return substance_use_flag
+
+    def non_substance_antecedents(antes):
         for a in antes:
             if 'True' in a:
                 return False
@@ -36,7 +45,9 @@ def get_interesting_rules(rules):
                 return False
         return True
 
-    interesting_rules = rules[(rules['consequents'].apply(
-        filter_consequants)) & (rules['antecedents'].apply(filter_antecedents))].sort_values('support', ascending=False)
+    other_rules = rules[(rules['consequents'].apply(
+        filter_consequants)) & (rules['antecedents'].apply(non_substance_antecedents))].sort_values('support', ascending=False)
+    substance_substance_rules = rules[(rules['consequents'].apply(
+        filter_consequants)) & (rules['antecedents'].apply(only_substance_antecedents))].sort_values('support', ascending=False)
 
-    return interesting_rules
+    return substance_substance_rules, other_rules

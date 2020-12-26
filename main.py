@@ -19,8 +19,10 @@ def main():
     readable_df.to_csv('readable.csv')
 
     assoc_rules = association.find_association_rules(assoc_df)
-    interesting_rules = association.get_interesting_rules(assoc_rules)
-    interesting_rules.to_csv('interesting_rules.csv')
+    substance_rules, other_rules = association.get_interesting_rules(
+        assoc_rules)
+    substance_rules.to_csv('substance_rules.csv')
+    other_rules.to_csv('other_rules.csv')
 
     nbc_score, nbc_time = classification.naive_bayes_classification(
         train_in, test_in, train_out, test_out)

@@ -1,7 +1,7 @@
 readable.csv
 association.csv
 classification.csv
-interesting_rules.csv
+*_rules.csv
 *.png
 *.pdf
 __pycache__
